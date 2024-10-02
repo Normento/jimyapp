@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('url')->nullable();
             $table->string('image_url')->nullable();
             $table->enum('status', ['pending', 'processed', 'failed'])->default('pending');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

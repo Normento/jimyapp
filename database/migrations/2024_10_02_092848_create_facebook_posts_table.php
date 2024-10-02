@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('status', ['posted', 'failed'])->default('posted');
             $table->timestamp('scheduled_at')->nullable(); // Date de publication programmée
             $table->timestamp('posted_at')->nullable(); // Date de publication réelle
+            $table->softDeletes();
             $table->timestamps();
         });
     }

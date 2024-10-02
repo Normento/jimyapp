@@ -6,10 +6,11 @@ use App\Models\User;
 use App\Models\League;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PublicationConfig extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
 
     protected $fillable = [

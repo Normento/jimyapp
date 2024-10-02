@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name'); // Nom de la ligue
             $table->string('code')->unique();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
