@@ -27,5 +27,7 @@ class AppServiceProvider extends ServiceProvider
                 SecurityScheme::apiKey('bearer', 'api_token')
             );
         });
+
+        
     }
 }
