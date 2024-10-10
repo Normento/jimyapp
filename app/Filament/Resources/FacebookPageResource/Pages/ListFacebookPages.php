@@ -15,7 +15,7 @@ class ListFacebookPages extends ListRecords
     {
         return [
             // Action pour créer une nouvelle FacebookPage manuellement
-            Actions\CreateAction::make(),
+            //Actions\CreateAction::make(),
 
             // Action personnalisée pour connecter une Page Facebook via OAuth
             Actions\Action::make('connectFacebookPage')
