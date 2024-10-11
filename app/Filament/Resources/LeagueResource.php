@@ -18,9 +18,9 @@ class LeagueResource extends Resource
     protected static ?string $model = League::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-share';
-    protected static ?string $navigationLabel = 'Ligas'; // Adapter selon votre langue
-    protected static ?string $pluralModelLabel = 'Ligas';
-    protected static ?string $modelLabel = 'Liga';
+    protected static ?string $navigationLabel = 'League';
+    protected static ?string $pluralModelLabel = 'League';
+    protected static ?string $modelLabel = 'League';
 
     public static function form(Form $form): Form
     {
@@ -56,7 +56,7 @@ class LeagueResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                //Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
