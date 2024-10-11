@@ -15,6 +15,7 @@ class PublicationConfig extends Model
 
     protected $fillable = [
         'user_id',
+        'page_id',
         'number_of_posts_per_day',
         'interval_minutes',
         'start_date',

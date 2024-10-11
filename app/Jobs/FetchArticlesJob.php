@@ -35,7 +35,7 @@ class FetchArticlesJob implements ShouldQueue
 
         $response = Http::withHeaders([
             'x-rapidapi-host' => 'google-news13.p.rapidapi.com',
-            'x-rapidapi-key' => env('RAPIDAPI_KEY'),
+            'x-rapidapi-key' => env('EXTERNAL_API_KEY'),
         ])->get($apiUrl);
 
         if ($response->successful()) {
@@ -92,6 +92,5 @@ class FetchArticlesJob implements ShouldQueue
             Log::error('Échec de la récupération des articles', ['response' => $response->body()]);
         }
 
-        self::dispatch()->delay(now()->addMinutes(15));
     }
 }
