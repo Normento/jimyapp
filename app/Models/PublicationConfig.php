@@ -38,4 +38,9 @@ class PublicationConfig extends Model
     {
         return $this->belongsTo(League::class);
     }
+
+    public function page()
+    {
+        return $this->belongsTo(FacebookPage::class);
+    }
 }

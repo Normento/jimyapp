@@ -15,7 +15,7 @@ class RewrittenArticle extends Model
 
     protected $fillable = [
         'league_id',
-        'user_id',
+        'page_id',
         'title',
         'description',
         'content',
@@ -47,4 +47,7 @@ class RewrittenArticle extends Model
     {
         return $this->hasMany(FacebookPost::class);
     }
+
+
+    
 }

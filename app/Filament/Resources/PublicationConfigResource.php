@@ -26,9 +26,9 @@ class PublicationConfigResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label('Utilisateur')
-                    ->relationship('user', 'name')
+                Forms\Components\Select::make('page_id')
+                    ->label('Page')
+                    ->relationship('page', 'name')
                     ->required(),
                 Forms\Components\Select::make('league_id')
                     ->label('Ligue')
