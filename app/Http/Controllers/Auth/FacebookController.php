@@ -66,12 +66,12 @@ class FacebookController extends Controller
                     );
                 }
 
-                return redirect()->route('filament.admin.resources.facebook-posts.index')->with('success', 'Page(s) Facebook connectée(s) avec succès.');
+                return redirect()->route('filament.admin.resources.facebook-pages.index')->with('success', 'Page(s) Facebook connectée(s) avec succès.');
             } else {
-                return redirect()->route('filament.admin.resources.facebook-posts.index')->with('error', 'Échec de récupération des pages Facebook.');
+                return redirect()->route('filament.admin.resources.facebook-pages.index')->with('error', 'Échec de récupération des pages Facebook.');
             }
         } catch (\Exception $e) {
-            return redirect()->route('filament.admin.resources.facebook-posts.index')->with('error', 'Erreur lors de la connexion avec Facebook.');
+            return redirect()->route('filament.admin.resources.facebook-pages.index')->with('error', 'Erreur lors de la connexion avec Facebook.');
         }
     }
 
