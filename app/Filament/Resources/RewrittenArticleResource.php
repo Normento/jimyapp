@@ -26,10 +26,6 @@ class RewrittenArticleResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('page_id')
-                    ->label('Page')
-                    ->relationship('page', 'name')
-                    ->required(),
                 Forms\Components\Select::make('league_id')
                     ->label('Ligue')
                     ->relationship('league', 'name')
@@ -64,7 +60,6 @@ class RewrittenArticleResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
-                Tables\Columns\TextColumn::make('user.name')->label('Utilisateur')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('league.name')->label('Ligue')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('title')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('status')->sortable()->badge()->colors([

@@ -15,7 +15,6 @@ class RewrittenArticle extends Model
 
     protected $fillable = [
         'league_id',
-        'page_id',
         'title',
         'description',
         'content',
@@ -49,5 +48,5 @@ class RewrittenArticle extends Model
     }
 
 
-    
+
 }
