@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('publication_configs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Référence à l'utilisateur
-            $table->foreignId('league_id')->constrained()->onDelete('cascade'); // Référence à la ligue
             $table->integer('number_of_posts_per_day');
             $table->integer('interval_minutes');
             $table->date('start_date');

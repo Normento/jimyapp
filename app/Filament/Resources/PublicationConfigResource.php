@@ -30,10 +30,6 @@ class PublicationConfigResource extends Resource
                     ->label('Page')
                     ->relationship('page', 'name')
                     ->required(),
-                Forms\Components\Select::make('league_id')
-                    ->label('Ligue')
-                    ->relationship('league', 'name')
-                    ->required(),
                 Forms\Components\TextInput::make('number_of_posts_per_day')
                     ->label('Nombre de Publications par Jour')
                     ->required()
@@ -68,9 +64,9 @@ class PublicationConfigResource extends Resource
                 Tables\Columns\TextColumn::make('league.name')->label('Ligue')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('number_of_posts_per_day')->label('Posts/Jour')->sortable(),
                 Tables\Columns\TextColumn::make('interval_minutes')->label('Intervalle (min)')->sortable(),
-                Tables\Columns\IconColumn::make('is_active')->boolean(),
-                Tables\Columns\TextColumn::make('start_date')->date()->sortable(),
-                Tables\Columns\TextColumn::make('end_date')->date()->sortable(),
+                Tables\Columns\IconColumn::make('is_active')->boolean()->label('Status'),
+                Tables\Columns\TextColumn::make('start_date')->date()->sortable()->label('Date de début'),
+                Tables\Columns\TextColumn::make('end_date')->date()->sortable()->label('Date de fin'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
