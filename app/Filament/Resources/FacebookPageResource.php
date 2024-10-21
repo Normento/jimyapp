@@ -53,7 +53,7 @@ class FacebookPageResource extends Resource
                 Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('user.name')->label('Utilisateur')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('facebook_page_id')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('facebook_page_id')->sortable()->searchable()->label('ID'),
                 Tables\Columns\TextColumn::make('perms')->limit(50),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
