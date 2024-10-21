@@ -13,6 +13,21 @@ class PublicationConfig extends Model
     use HasFactory, SoftDeletes;
 
 
+
+
+    protected static function boot(): void
+    {
+
+        static::creating(function ($model) {
+
+            if (auth()->check()) {
+                $model->user_id = auth()->user()->id;
+                $model->save();
+            }
+        });
+    }
+
+
     protected $fillable = [
         'user_id',
         'page_id',
