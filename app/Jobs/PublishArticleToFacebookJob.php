@@ -72,12 +72,12 @@ class PublishArticleToFacebookJob implements ShouldQueue
                 ];
 
                 FacebookPost::create($data);
-                
+
             }
 
             Log::info('Article ID ' . $article->id . ' publié sur Facebook.');
         } catch (\Exception $e) {
-            Log::error('Échec de la publication de l\'article ID ' . $article->id . ' : ' . $e->getMessage());
+            Log::error('Échec de la publication de l\'article ID ' . $article->id . ' : ' . $e->getMessage(). ' - ' . $e->getFile(). ' - ' . $e->getLine());
         }
     }
 }
