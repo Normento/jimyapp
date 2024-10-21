@@ -40,16 +40,20 @@ class FacebookService
                 $mediaBody = $mediaResponse->getDecodedBody();
 
                 Log::info("Media", $mediaBody);
+
+                if (!isset($mediaBody['id'])) {
+                    throw new \Exception('Échec du téléchargement du média : ' . json_encode($mediaBody));
+                }
+
+                if (isset($mediaBody['error'])) {
+                    throw new \Exception('Erreur du média : ' . $mediaBody['error']['message']);
+                }
                 $mediaId = $mediaBody['id'];
 
                 // Préparer les données de la publication avec l'image
                 $data = [
                     'message' => $message,
-                    'attached_media' => [
-                        [
-                            'media_fbid' => $mediaId,
-                        ],
-                    ],
+                    'object_attachment' => $mediaId,
                 ];
             } else {
                 // Préparer les données de la publication sans image
