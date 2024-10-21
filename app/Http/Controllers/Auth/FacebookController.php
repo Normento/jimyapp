@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Carbon\Carbon;
 use App\Models\League;
 use App\Models\FacebookPage;
 use Illuminate\Http\Request;
 use App\Services\OpenAiService;
 use App\Models\RewrittenArticle;
+use App\Models\PublicationConfig;
+use App\Services\FacebookService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Facades\Socialite;
+use App\Jobs\PublishArticleToFacebookJob;
 
 class FacebookController extends Controller
 {
@@ -150,5 +154,58 @@ class FacebookController extends Controller
             Log::error('Échec de la récupération des articles', ['response' => $response->body()]);
         }
 
+    }
+
+
+    public function publish(){
+        // Étape 1 : Récupérer une configuration de publication active
+        $publicationConfig = PublicationConfig::where('is_active', true)
+        ->whereDate('start_date', '<=', Carbon::today())
+        ->whereDate('end_date', '>=', Carbon::today())
+        ->first();
+
+        if (!$publicationConfig) {
+            Log::info('Aucune configuration de publication active trouvée.');
+            return;
+        }
+
+        // Étape 2 : Récupérer les articles réécrits avec le statut 'published'
+        $articles = RewrittenArticle::where('status', 'processed')
+            ->take($publicationConfig->number_of_posts_per_day)
+            ->get();
+
+        if ($articles->isEmpty()) {
+            Log::info('Aucun article publié trouvé.');
+            return;
+        }
+
+        // Étape 3 : Récupérer les informations de la page Facebook
+        $facebookPage = FacebookPage::where('id', $publicationConfig->page_id)->first();
+
+        if (!$facebookPage) {
+            Log::error('Aucune page Facebook trouvée pour l\'utilisateur ID : ' . $publicationConfig->user_id);
+            return;
+        }
+
+        // Étape 4 : Initialiser le service Facebook
+        $facebookService = new FacebookService(new \Facebook\Facebook([
+            'app_id' => env('FACEBOOK_APP_ID'),
+            'app_secret' => env('FACEBOOK_APP_SECRET'),
+            'default_graph_version' => 'v12.0',
+        ]));
+
+        $facebookService->setPageAccessToken($facebookPage->access_token);
+        $facebookService->setPageId($facebookPage->facebook_page_id);
+
+        // Étape 5 : Programmer la publication des articles
+        foreach ($articles as $index => $article) {
+            $delay = now()->addMinutes($publicationConfig->interval_minutes * $index);
+
+            // Dispatcher un job pour chaque article
+            PublishArticleToFacebookJob::dispatch($article->id, $facebookPage->id)
+                ->delay($delay);
+        }
+
+        return true;
     }
 }

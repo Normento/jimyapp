@@ -20,3 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('test', [FacebookController::class,'post']);
+
+Route::get('publish', [FacebookController::class,'publish']);
+

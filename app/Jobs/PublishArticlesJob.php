@@ -38,9 +38,8 @@ class PublishArticlesJob implements ShouldQueue
             return;
         }
 
-        // Étape 2 : Récupérer les articles réécrits avec le statut 'published'
-        $articles = RewrittenArticle::where('status', 'published')
-            ->where('status', 'processed')
+        // Étape 2 : Récupérer les articles réécrits avec le statut 'processed'
+        $articles = RewrittenArticle::where('status', 'processed')
             ->take($publicationConfig->number_of_posts_per_day)
             ->get();
 
