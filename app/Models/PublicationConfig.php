@@ -4,13 +4,23 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\League;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PublicationConfig extends Model
 {
     use HasFactory, SoftDeletes;
+
+
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->user_id = Auth::id();
+        });
+    }
 
 
     protected $fillable = [
