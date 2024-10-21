@@ -4,9 +4,10 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\League;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PublicationConfig extends Model
 {
@@ -14,16 +15,11 @@ class PublicationConfig extends Model
 
 
 
-
-    protected static function boot(): void
+    
+    protected static function booted()
     {
-
         static::creating(function ($model) {
-
-            if (auth()->check()) {
-                $model->user_id = auth()->user()->id;
-                $model->save();
-            }
+            $model->user_id = Auth::id();
         });
     }
 

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Facebook\Facebook;
+use Illuminate\Support\Facades\Log;
 
 class FacebookService
 {
@@ -37,6 +38,8 @@ class FacebookService
                 ], $this->pageAccessToken);
 
                 $mediaBody = $mediaResponse->getDecodedBody();
+
+                Log::info("Media", $mediaBody);
                 $mediaId = $mediaBody['id'];
 
                 // Préparer les données de la publication avec l'image
@@ -55,19 +58,24 @@ class FacebookService
                 ];
             }
 
+            Log::info("DATA", $data);
+
             // Publier le message
             $response = $this->fb->post("/{$this->pageId}/feed", $data, $this->pageAccessToken);
 
             $result = $response->getDecodedBody();
+
+            Log::info("RESULT", $result);
+
             $postId = $result['id']; // L'ID de la publication
             return $postId;
 
         } catch (\Facebook\Exceptions\FacebookResponseException $e) {
             // Erreur renvoyée par l'API Graph
-            throw new \Exception('Graph API returned an error: ' . $e->getMessage());
+            throw new \Exception('Graph API returned an error: ' . $e->getMessage(). ' - ' . $e->getFile());
         } catch (\Facebook\Exceptions\FacebookSDKException $e) {
             // Erreur du SDK Facebook
-            throw new \Exception('Facebook SDK returned an error: ' . $e->getMessage());
+            throw new \Exception('Facebook SDK returned an error: ' . $e->getMessage(). ' - ' . $e->getFile());
         }
     }
 
