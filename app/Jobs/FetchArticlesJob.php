@@ -44,31 +44,31 @@ class FetchArticlesJob implements ShouldQueue
             if (isset($articles['items'])) {
                 foreach ($articles['items'] as $article) {
                     try {
-                        $rewrittenContent = $this->openAiService->write($article['title'], $article['snippet']);
+                       // $rewrittenContent = $this->openAiService->write($article['title'], $article['snippet']);
 
                         RewrittenArticle::create([
                             'league_id'   => $league->id,
                             'title'       => $article['title'],
                             'description' => $article['snippet'],
-                            'content'     => $rewrittenContent,
+                            'content'     => $article['snippet'],
                             'url'         => $article['newsUrl'],
                             'image_url'   => $article['images']['thumbnail'] ?? null,
-                            'status'      => 'published',
+                            'status'      => 'processed',
                         ]);
 
                         if ($article['hasSubnews'] == true) {
                             foreach ($article['subnews'] as $subnews) {
                                 try {
-                                    $rewrittenSubnewsContent = $this->openAiService->write($subnews['title'], $subnews['snippet']);
+                                    //$rewrittenSubnewsContent = $this->openAiService->write($subnews['title'], $subnews['snippet']);
 
                                     RewrittenArticle::create([
                                         'league_id'   => $league->id,
                                         'title'       => $subnews['title'],
                                         'description' => $subnews['snippet'],
-                                        'content'     => $rewrittenSubnewsContent,
+                                        'content'     => $subnews['snippet'],
                                         'url'         => $subnews['newsUrl'],
                                         'image_url'   => $subnews['images']['thumbnail']?? null,
-                                        'status'      => 'published',
+                                        'status'      => 'processed',
                                     ]);
                                 } catch (\Exception $e) {
                                     Log::error('Erreur lors du traitement de la sous-nouvelle', [

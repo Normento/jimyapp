@@ -61,7 +61,8 @@ class RewrittenArticleResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('league.name')->label('Ligue')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('title')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('title')->sortable()->wrap()->toggleable()->searchable(),
+                Tables\Columns\TextColumn::make('content')->sortable()->wrap()->toggleable()->searchable(),
                 Tables\Columns\TextColumn::make('status')->sortable()->badge()->colors([
                     'secondary' => 'pending',
                     'success' => 'processed',

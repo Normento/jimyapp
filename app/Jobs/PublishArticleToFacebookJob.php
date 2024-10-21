@@ -72,6 +72,7 @@ class PublishArticleToFacebookJob implements ShouldQueue
                 ];
 
                 FacebookPost::create($data);
+                
             }
 
             Log::info('Article ID ' . $article->id . ' publié sur Facebook.');

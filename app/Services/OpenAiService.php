@@ -16,7 +16,7 @@ class OpenAiService
         $prompt = str_replace(['{{title}}', '{{snippet}}'], [$title, $snippet], $promptTemplate);
 
         $result = OpenAI::chat()->create([
-            'model' => 'gpt-3.5-turbo', // On peut aussi utiliser 'gpt-3.5-turbo'
+            'model' => 'gpt-4o', // On peut aussi utiliser 'gpt-3.5-turbo'
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
             ],

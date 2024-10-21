@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('rewritten_articles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('league_id')->constrained()->onDelete('cascade'); // Référence à la ligue
-            $table->unsignedBigInteger('page_id'); // Référence à une page
             $table->string('title');
             $table->text('description');
             $table->text('content');
