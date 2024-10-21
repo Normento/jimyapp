@@ -15,6 +15,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.8",
+        "nazmulhasan/laravel-facebook-post": "^1.0",
         "openai-php/laravel": "^0.10.1"
     },
     "require-dev": {

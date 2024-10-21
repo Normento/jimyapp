@@ -2,18 +2,19 @@
 
 namespace App\Jobs;
 
-use App\Models\RewrittenArticle;
+use Carbon\Carbon;
 use App\Models\FacebookPage;
 use App\Models\FacebookPost;
-use App\Services\FacebookService;
 use Illuminate\Bus\Queueable;
+use App\Models\RewrittenArticle;
+use App\Services\FacebookService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
+use NazmulHasan\LaravelFacebookPost\Facades\FacebookPost as PublishPost;
 
 class PublishArticleToFacebookJob implements ShouldQueue
 {
@@ -46,26 +47,35 @@ class PublishArticleToFacebookJob implements ShouldQueue
             return;
         }
 
-        // Initialiser le service Facebook
-        $facebookService = new FacebookService(new \Facebook\Facebook([
-            'app_id' => env('FACEBOOK_APP_ID'),
-            'app_secret' => env('FACEBOOK_APP_SECRET'),
-            'default_graph_version' => 'v12.0',
-        ]));
+        // // Initialiser le service Facebook
+        // $facebookService = new FacebookService(new \Facebook\Facebook([
+        //     'app_id' => env('FACEBOOK_APP_ID'),
+        //     'app_secret' => env('FACEBOOK_APP_SECRET'),
+        //     'default_graph_version' => 'v12.0',
+        // ]));
 
-        $facebookService->setPageAccessToken($facebookPage->access_token);
-        $facebookService->setPageId($facebookPage->facebook_page_id);
+        // $facebookService->setPageAccessToken($facebookPage->access_token);
+        // $facebookService->setPageId($facebookPage->facebook_page_id);
 
         // Publier l'article
         try {
             $message = $article->title . "\n\n" . $article->content;
             $imageUrl = $article->image_url;
 
-            $id = $facebookService->publishToPage($message, $imageUrl);
+            $response = PublishPost::storePostWithPhoto($imageUrl, $message);
 
-            if ($id) {
+            Log::info('RESPONSE',$response);
+            
+            if (!$response['post_id']) {
+                Log::error('Échec de la publication de l\'article ID ' . $article->id);
+                return;
+            }
+
+            //$id = $facebookService->publishToPage($message, $imageUrl);
+
+            if ($response['post_id']) {
                 $data =  [
-                    'facebook_post_id' => $id,
+                    'facebook_post_id' => $response['post_id'],
                     'rewritten_article_id' => $article->id,
                     'status' => 'posted',
                     'posted_at' => Carbon::now(),

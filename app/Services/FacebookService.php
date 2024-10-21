@@ -27,60 +27,55 @@ class FacebookService
     }
 
     public function publishToPage(string $message, string $imageUrl = null)
-    {
-        try {
-            // Vérifier si une image est fournie
-            if ($imageUrl) {
-                // Étape 1 : Télécharger l'image en tant que média non publié
-                $mediaResponse = $this->fb->post("/{$this->pageId}/photos", [
-                    'url' => $imageUrl,
-                    'published' => false,
-                ], $this->pageAccessToken);
+{
+    try {
+        if ($imageUrl) {
+            $mediaResponse = $this->fb->post("/{$this->pageId}/photos", [
+                'url' => $imageUrl,
+                'published' => false,
+            ], $this->pageAccessToken);
 
-                $mediaBody = $mediaResponse->getDecodedBody();
+            $mediaBody = $mediaResponse->getDecodedBody();
 
-                Log::info("Media", $mediaBody);
+            Log::info("Media", $mediaBody);
 
-                if (!isset($mediaBody['id'])) {
-                    throw new \Exception('Échec du téléchargement du média : ' . json_encode($mediaBody));
-                }
-
-                if (isset($mediaBody['error'])) {
-                    throw new \Exception('Erreur du média : ' . $mediaBody['error']['message']);
-                }
-                $mediaId = $mediaBody['id'];
-
-                // Préparer les données de la publication avec l'image
-                $data = [
-                    'message' => $message,
-                    'object_attachment' => $mediaId,
-                ];
-            } else {
-                // Préparer les données de la publication sans image
-                $data = [
-                    'message' => $message,
-                ];
+            if (!isset($mediaBody['id'])) {
+                throw new \Exception('Échec du téléchargement du média : ' . json_encode($mediaBody));
             }
 
-            Log::info("DATA", $data);
+            $mediaId = $mediaBody['id'];
 
-            // Publier le message
-            $response = $this->fb->post("/{$this->pageId}/feed", $data, $this->pageAccessToken);
-
-            $result = $response->getDecodedBody();
-
-            Log::info("RESULT", $result);
-
-            $postId = $result['id']; // L'ID de la publication
-            return $postId;
-
-        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            // Erreur renvoyée par l'API Graph
-            throw new \Exception('Graph API returned an error: ' . $e->getMessage(). ' - ' . $e->getFile());
-        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-            // Erreur du SDK Facebook
-            throw new \Exception('Facebook SDK returned an error: ' . $e->getMessage(). ' - ' . $e->getFile());
+            $data = [
+                'message' => $message,
+                'object_attachment' => $mediaId,
+            ];
+        } else {
+            $data = [
+                'message' => $message,
+            ];
         }
+
+        Log::info("DATA", $data);
+
+        $response = $this->fb->post("/{$this->pageId}/feed", $data, $this->pageAccessToken);
+
+        $result = $response->getDecodedBody();
+
+        Log::info("RESULT", $result);
+
+        if (isset($result['error'])) {
+            throw new \Exception('Erreur lors de la publication : ' . $result['error']['message']);
+        }
+
+        $postId = $result['id']; // L'ID de la publication
+        return $postId;
+
+    } catch (\Facebook\Exceptions\FacebookResponseException $e) {
+        throw new \Exception('Graph API a renvoyé une erreur : ' . $e->getMessage() . ' - ' . json_encode($e->getResponse()->getDecodedBody()));
+    } catch (\Facebook\Exceptions\FacebookSDKException $e) {
+        throw new \Exception('Le SDK Facebook a renvoyé une erreur : ' . $e->getMessage());
     }
+}
+
 
 }

@@ -187,7 +187,7 @@ class FacebookController extends Controller
             return;
         }
 
-        // Étape 4 : Initialiser le service Facebook
+        /* // Étape 4 : Initialiser le service Facebook
         $facebookService = new FacebookService(new \Facebook\Facebook([
             'app_id' => env('FACEBOOK_APP_ID'),
             'app_secret' => env('FACEBOOK_APP_SECRET'),
@@ -195,7 +195,7 @@ class FacebookController extends Controller
         ]));
 
         $facebookService->setPageAccessToken($facebookPage->access_token);
-        $facebookService->setPageId($facebookPage->facebook_page_id);
+        $facebookService->setPageId($facebookPage->facebook_page_id); */
 
         // Étape 5 : Programmer la publication des articles
         foreach ($articles as $index => $article) {
