@@ -60,11 +60,6 @@ class PublishArticleToFacebookJob implements ShouldQueue
                 $facebookPage->access_token
             );
 
-            // Vérification de la réponse et gestion des erreurs
-            if (!isset($response['id'])) {
-                Log::error('Échec de la publication de l\'article ID ' . $article->id . '. Aucune ID retournée par Facebook.');
-                return;
-            }
 
             // Sauvegarde de la publication dans la base de données
             $data = [
@@ -76,11 +71,11 @@ class PublishArticleToFacebookJob implements ShouldQueue
 
             FacebookPost::create($data);
 
-            Log::info('Article ID ' . $article->id . ' publié avec succès sur Facebook. ID de la publication Facebook : ' . $response['id']);
+            //Log::info('Article ID ' . $article->id . ' publié avec succès sur Facebook. ID de la publication Facebook : ' . $response['id']);
 
         } catch (\Exception $e) {
             // Gestion des exceptions et logging des erreurs détaillées
-            Log::error('Échec de la publication de l\'article ID ' . $article->id . ' : ' . $e->getMessage() . ' dans ' . $e->getFile() . ' à la ligne ' . $e->getLine());
+            //Log::error('Échec de la publication de l\'article ID ' . $article->id . ' : ' . $e->getMessage() . ' dans ' . $e->getFile() . ' à la ligne ' . $e->getLine());
         }
     }
 }
