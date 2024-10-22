@@ -5,16 +5,14 @@ namespace App\Jobs;
 use Carbon\Carbon;
 use App\Models\FacebookPage;
 use App\Models\FacebookPost;
-use Illuminate\Bus\Queueable;
 use App\Models\RewrittenArticle;
 use App\Services\FacebookService;
+use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Log;
-
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use NazmulHasan\LaravelFacebookPost\Facades\FacebookPost as PublishPost;
 
 class PublishArticleToFacebookJob implements ShouldQueue
 {
@@ -35,7 +33,7 @@ class PublishArticleToFacebookJob implements ShouldQueue
         $article = RewrittenArticle::find($this->articleId);
 
         if (!$article) {
-            Log::error('Article non trouvé : ID ' . $this->articleId);
+            Log::error('Article non trouvé pour l\'ID : ' . $this->articleId);
             return;
         }
 
@@ -43,57 +41,46 @@ class PublishArticleToFacebookJob implements ShouldQueue
         $facebookPage = FacebookPage::find($this->facebookPageId);
 
         if (!$facebookPage) {
-            Log::error('Page Facebook non trouvée : ID ' . $this->facebookPageId);
+            Log::error('Page Facebook non trouvée pour l\'ID : ' . $this->facebookPageId);
             return;
         }
 
         $facebookService = new FacebookService();
 
-
-
-        // // Initialiser le service Facebook
-        // $facebookService = new FacebookService(new \Facebook\Facebook([
-        //     'app_id' => env('FACEBOOK_APP_ID'),
-        //     'app_secret' => env('FACEBOOK_APP_SECRET'),
-        //     'default_graph_version' => 'v12.0',
-        // ]));
-
-        // $facebookService->setPageAccessToken($facebookPage->access_token);
-        // $facebookService->setPageId($facebookPage->facebook_page_id);
-
-        // Publier l'article
+        // Publier l'article sur la page Facebook
         try {
             $message = $article->title . "\n\n" . $article->content;
-            $imageUrl = $article->image_url;
+            $imageUrl = $article->image_url; // URL de l'image associée à l'article, si disponible
 
-            $response = $facebookService->publishToPage($message,$imageUrl,$facebookPage->facebook_page_id,$facebookPage->access_token);
+            // Appel à l'API via le service Facebook
+            $response = $facebookService->publishToPage(
+                $message,
+                $imageUrl,
+                $facebookPage->facebook_page_id,
+                $facebookPage->access_token
+            );
 
-            //$response = PublishPost::storePostWithPhoto($imageUrl, $message);
-
-            //Log::info('RESPONSE',$response);
-
-            if (!$response['id']) {
-                Log::error('Échec de la publication de l\'article ID ' . $article->id);
+            // Vérification de la réponse et gestion des erreurs
+            if (!isset($response['id'])) {
+                Log::error('Échec de la publication de l\'article ID ' . $article->id . '. Aucune ID retournée par Facebook.');
                 return;
             }
 
-            //$id = $facebookService->publishToPage($message, $imageUrl);
+            // Sauvegarde de la publication dans la base de données
+            $data = [
+                'facebook_post_id' => $response['id'],
+                'rewritten_article_id' => $article->id,
+                'status' => 'posted',
+                'posted_at' => Carbon::now(),
+            ];
 
-            if ($response['id']) {
-                $data =  [
-                    'facebook_post_id' => $response['id'],
-                    'rewritten_article_id' => $article->id,
-                    'status' => 'posted',
-                    'posted_at' => Carbon::now(),
-                ];
+            FacebookPost::create($data);
 
-                FacebookPost::create($data);
+            Log::info('Article ID ' . $article->id . ' publié avec succès sur Facebook. ID de la publication Facebook : ' . $response['id']);
 
-            }
-
-            Log::info('Article ID ' . $article->id . ' publié sur Facebook.');
         } catch (\Exception $e) {
-            Log::error('Échec de la publication de l\'article ID ' . $article->id . ' : ' . $e->getMessage(). ' - ' . $e->getFile(). ' - ' . $e->getLine());
+            // Gestion des exceptions et logging des erreurs détaillées
+            Log::error('Échec de la publication de l\'article ID ' . $article->id . ' : ' . $e->getMessage() . ' dans ' . $e->getFile() . ' à la ligne ' . $e->getLine());
         }
     }
 }
