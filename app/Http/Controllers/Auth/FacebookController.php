@@ -104,7 +104,7 @@ class FacebookController extends Controller
                             'content'     => $article['content'],
                             'url'         => $article['url'],
                             'image_url'   => $article['urlToImage'] ?? null,
-                            'status'      => 'processed',
+                            'status'      => 'pending',
                         ]);
 
                     } catch (\Exception $e) {
@@ -135,8 +135,8 @@ class FacebookController extends Controller
             return;
         }
 
-        // Étape 2 : Récupérer les articles réécrits avec le statut 'published'
-        $articles = RewrittenArticle::where('status', 'processed')
+        // Étape 2 : Récupérer les articles réécrits avec le statut 'pending'
+        $articles = RewrittenArticle::where('status', 'pending')
             ->take($publicationConfig->number_of_posts_per_day)
             ->get();
 
@@ -152,16 +152,6 @@ class FacebookController extends Controller
             Log::error('Aucune page Facebook trouvée pour l\'utilisateur ID : ' . $publicationConfig->user_id);
             return;
         }
-
-        /* // Étape 4 : Initialiser le service Facebook
-        $facebookService = new FacebookService(new \Facebook\Facebook([
-            'app_id' => env('FACEBOOK_APP_ID'),
-            'app_secret' => env('FACEBOOK_APP_SECRET'),
-            'default_graph_version' => 'v12.0',
-        ]));
-
-        $facebookService->setPageAccessToken($facebookPage->access_token);
-        $facebookService->setPageId($facebookPage->facebook_page_id); */
 
         // Étape 5 : Programmer la publication des articles
         foreach ($articles as $index => $article) {
