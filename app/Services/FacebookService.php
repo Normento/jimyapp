@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Services;
+
 use Facebook\Facebook;
 use Illuminate\Support\Facades\Log;
 

@@ -3,14 +3,14 @@
 namespace App\Jobs;
 
 use Carbon\Carbon;
-use FacebookService;
 use App\Models\FacebookPage;
 use App\Models\FacebookPost;
 use Illuminate\Bus\Queueable;
 use App\Models\RewrittenArticle;
+use App\Services\FacebookService;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Queue\SerializesModels;
 
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
