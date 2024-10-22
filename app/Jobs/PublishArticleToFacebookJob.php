@@ -71,7 +71,9 @@ class PublishArticleToFacebookJob implements ShouldQueue
                 'posted_at' => Carbon::now(),
             ];
 
-            FacebookPost::create($data);
+            $post = FacebookPost::make($data);
+
+            $post->facebookPage()->associate($facebookPage);
 
             $article->update(['status' => 'processed']);
 
