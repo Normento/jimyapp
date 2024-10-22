@@ -75,6 +75,8 @@ class PublishArticleToFacebookJob implements ShouldQueue
 
             $post->facebookPage()->associate($facebookPage);
 
+            $post->save();
+
             $article->update(['status' => 'processed']);
 
             //Log::info('Article ID ' . $article->id . ' publié avec succès sur Facebook. ID de la publication Facebook : ' . $response['id']);
