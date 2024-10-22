@@ -65,7 +65,7 @@ class PublishArticleToFacebookJob implements ShouldQueue
 
             // Sauvegarde de la publication dans la base de données
             $data = [
-                'facebook_post_id' => $response['id'],
+                'facebook_post_id' => $response,
                 'rewritten_article_id' => $article->id,
                 'status' => 'posted',
                 'posted_at' => Carbon::now(),
