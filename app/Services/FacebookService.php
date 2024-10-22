@@ -2,64 +2,79 @@
 
 namespace App\Services;
 
-use Facebook\Facebook;
+
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 
 class FacebookService
 {
-    protected $fb;
+    protected $client;
 
     public function __construct()
     {
-        // Initialisation du SDK Facebook avec les informations de votre app
-        $this->fb = new Facebook([
-            'app_id' => env('FACEBOOK_APP_ID'),
-            'app_secret' => env('FACEBOOK_APP_SECRET'),
-            'default_graph_version' => 'v12.0',
-        ]);
-
+        // Initialisation du client HTTP
+        $this->client = new Client();
     }
 
-    public function publishToPage($message, $imageUrl = null, $pageId, $pageAccessToken)
+    /**
+     * Publier un message et une image sur la page Facebook
+     * @param string $message - Le texte à publier
+     * @param string|null $imageUrl - L'URL de l'image à publier (facultatif)
+     * @return string|null - L'ID de la publication si elle est réussie, sinon null
+     */
+    public function publishToPage($message, $imageUrl = null,$pageId,$pageAccessToken)
     {
         try {
+            // URL de l'API Graph pour publier sur le feed de la page
+            $url = "https://graph.facebook.com/{$pageId}/feed";
 
-            // Si une image est fournie, nous la publions avec le message
+            // Préparation des données à envoyer
+            $data = [
+                'message' => $message,
+                'access_token' => $pageAccessToken, // Token d'accès à la page
+            ];
+
+            // Si une image est fournie, on fait une autre requête pour l'uploader d'abord
             if ($imageUrl) {
-                // Étape 1 : Télécharger l'image sur la page Facebook
-                $mediaResponse = $this->fb->post("/{$pageId}/photos", [
-                    'url' => $imageUrl,
-                    'published' => false, // Charger l'image sans la publier immédiatement
-                ], $pageAccessToken);
+                // Étape 1 : Télécharger l'image en tant que média non publié
+                $uploadUrl = "https://graph.facebook.com/{$pageId}/photos";
+                $uploadResponse = $this->client->post($uploadUrl, [
+                    'form_params' => [
+                        'url' => $imageUrl,
+                        'published' => false, // On ne la publie pas immédiatement
+                        'access_token' => $pageAccessToken,
+                    ],
+                ]);
 
-                $media = $mediaResponse->getGraphNode();
-                $mediaId = $media['id'];
+                $uploadResult = json_decode($uploadResponse->getBody(), true);
 
-                // Étape 2 : Publier le message avec l'image
-                $data = [
-                    'message' => $message,
-                    'attached_media' => json_encode([['media_fbid' => $mediaId]]),
-                ];
-            } else {
-                // Si aucune image n'est fournie, nous publions seulement le message
-                $data = [
-                    'message' => $message,
-                ];
+                // Récupérer l'ID du média téléchargé
+                if (!isset($uploadResult['id'])) {
+                    throw new \Exception('Erreur lors de l\'upload de l\'image');
+                }
+
+                $mediaId = $uploadResult['id'];
+
+                // Ajout du média téléchargé à la publication
+                $data['attached_media'] = json_encode([['media_fbid' => $mediaId]]);
             }
 
-            // Publier sur la page avec l'ID de la page
-            $response = $this->fb->post("/{$pageId}/feed", $data, $pageAccessToken);
-            $result = $response->getGraphNode();
+            // Étape 2 : Publier le message avec (ou sans) l'image
+            $response = $this->client->post($url, [
+                'form_params' => $data,
+            ]);
 
-            Log::info('Publication réussie avec l\'ID : ' . $result['id']);
-            return $result['id'];
+            $result = json_decode($response->getBody(), true);
 
-        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            // Gestion des erreurs retournées par l'API Graph
-            Log::error('Erreur API Graph : ' . $e->getMessage());
-        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-            // Gestion des erreurs du SDK Facebook
-            Log::error('Erreur SDK Facebook : ' . $e->getMessage());
+            if (isset($result['id'])) {
+                Log::info('Publication réussie avec l\'ID : ' . $result['id']);
+                return $result['id'];
+            }
+
+            throw new \Exception('Erreur lors de la publication sur Facebook');
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la publication sur Facebook : ' . $e->getMessage());
+            return null;
         }
     }
 }

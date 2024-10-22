@@ -9,7 +9,7 @@
         "dedoc/scramble": "^0.11.16",
         "facebook/graph-sdk": "^5.1",
         "filament/filament": "^3.2",
-        "guzzlehttp/guzzle": "^7.2",
+        "guzzlehttp/guzzle": "^7.9",
         "laravel/breeze": "^1.29",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",

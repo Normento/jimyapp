@@ -70,7 +70,7 @@ class PublishArticleToFacebookJob implements ShouldQueue
 
             //$response = PublishPost::storePostWithPhoto($imageUrl, $message);
 
-            Log::info('RESPONSE',$response);
+            //Log::info('RESPONSE',$response);
 
             if (!$response['id']) {
                 Log::error('Échec de la publication de l\'article ID ' . $article->id);
