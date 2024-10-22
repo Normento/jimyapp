@@ -1,81 +1,63 @@
 <?php
 
-namespace App\Services;
-
 use Facebook\Facebook;
 use Illuminate\Support\Facades\Log;
 
 class FacebookService
 {
     protected $fb;
-    protected $pageAccessToken;
-    protected $pageId;
 
-    public function __construct(Facebook $fb)
+    public function __construct()
     {
-        $this->fb = $fb;
+        // Initialisation du SDK Facebook avec les informations de votre app
+        $this->fb = new Facebook([
+            'app_id' => env('FACEBOOK_APP_ID'),
+            'app_secret' => env('FACEBOOK_APP_SECRET'),
+            'default_graph_version' => 'v12.0',
+        ]);
+
     }
 
-    public function setPageAccessToken($token)
+    public function publishToPage($message, $imageUrl = null, $pageId, $pageAccessToken)
     {
-        $this->pageAccessToken = $token;
-    }
+        try {
 
-    public function setPageId($pageId)
-    {
-        $this->pageId = $pageId;
-    }
+            // Si une image est fournie, nous la publions avec le message
+            if ($imageUrl) {
+                // Étape 1 : Télécharger l'image sur la page Facebook
+                $mediaResponse = $this->fb->post("/{$pageId}/photos", [
+                    'url' => $imageUrl,
+                    'published' => false, // Charger l'image sans la publier immédiatement
+                ], $pageAccessToken);
 
-    public function publishToPage(string $message, string $imageUrl = null)
-{
-    try {
-        if ($imageUrl) {
-            $mediaResponse = $this->fb->post("/{$this->pageId}/photos", [
-                'url' => $imageUrl,
-                'published' => false,
-            ], $this->pageAccessToken);
+                $media = $mediaResponse->getGraphNode();
+                $mediaId = $media['id'];
 
-            $mediaBody = $mediaResponse->getDecodedBody();
-
-            Log::info("Media", $mediaBody);
-
-            if (!isset($mediaBody['id'])) {
-                throw new \Exception('Échec du téléchargement du média : ' . json_encode($mediaBody));
+                // Étape 2 : Publier le message avec l'image
+                $data = [
+                    'message' => $message,
+                    'attached_media' => json_encode([['media_fbid' => $mediaId]]),
+                ];
+            } else {
+                // Si aucune image n'est fournie, nous publions seulement le message
+                $data = [
+                    'message' => $message,
+                ];
             }
 
-            $mediaId = $mediaBody['id'];
+            // Publier sur la page avec l'ID de la page
+            $response = $this->fb->post("/{$pageId}/feed", $data, $pageAccessToken);
+            $result = $response->getGraphNode();
 
-            $data = [
-                'message' => $message,
-                'object_attachment' => $mediaId,
-            ];
-        } else {
-            $data = [
-                'message' => $message,
-            ];
+            Log::info('Publication réussie avec l\'ID : ' . $result['id']);
+            return $result['id'];
+
+        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
+            // Gestion des erreurs retournées par l'API Graph
+            Log::error('Erreur API Graph : ' . $e->getMessage());
+        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
+            // Gestion des erreurs du SDK Facebook
+            Log::error('Erreur SDK Facebook : ' . $e->getMessage());
         }
-
-        Log::info("DATA", $data);
-
-        $response = $this->fb->post("/{$this->pageId}/feed", $data, $this->pageAccessToken);
-
-        $result = $response->getDecodedBody();
-
-        Log::info("RESULT", $result);
-
-        if (isset($result['error'])) {
-            throw new \Exception('Erreur lors de la publication : ' . $result['error']['message']);
-        }
-
-        $postId = $result['id']; // L'ID de la publication
-        return $postId;
-
-    } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-        throw new \Exception('Graph API a renvoyé une erreur : ' . $e->getMessage() . ' - ' . json_encode($e->getResponse()->getDecodedBody()));
-    } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-        throw new \Exception('Le SDK Facebook a renvoyé une erreur : ' . $e->getMessage());
     }
-}
-
-
 }

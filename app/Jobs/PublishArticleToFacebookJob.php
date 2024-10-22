@@ -3,15 +3,15 @@
 namespace App\Jobs;
 
 use Carbon\Carbon;
+use FacebookService;
 use App\Models\FacebookPage;
 use App\Models\FacebookPost;
 use Illuminate\Bus\Queueable;
 use App\Models\RewrittenArticle;
-use App\Services\FacebookService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use NazmulHasan\LaravelFacebookPost\Facades\FacebookPost as PublishPost;
@@ -47,6 +47,10 @@ class PublishArticleToFacebookJob implements ShouldQueue
             return;
         }
 
+        $facebookService = new FacebookService();
+
+
+
         // // Initialiser le service Facebook
         // $facebookService = new FacebookService(new \Facebook\Facebook([
         //     'app_id' => env('FACEBOOK_APP_ID'),
@@ -62,20 +66,22 @@ class PublishArticleToFacebookJob implements ShouldQueue
             $message = $article->title . "\n\n" . $article->content;
             $imageUrl = $article->image_url;
 
-            $response = PublishPost::storePostWithPhoto($imageUrl, $message);
+            $response = $facebookService->publishToPage($message,$imageUrl,$facebookPage->facebook_page_id,$facebookPage->access_token);
+
+            //$response = PublishPost::storePostWithPhoto($imageUrl, $message);
 
             Log::info('RESPONSE',$response);
-            
-            if (!$response['post_id']) {
+
+            if (!$response['id']) {
                 Log::error('Échec de la publication de l\'article ID ' . $article->id);
                 return;
             }
 
             //$id = $facebookService->publishToPage($message, $imageUrl);
 
-            if ($response['post_id']) {
+            if ($response['id']) {
                 $data =  [
-                    'facebook_post_id' => $response['post_id'],
+                    'facebook_post_id' => $response['id'],
                     'rewritten_article_id' => $article->id,
                     'status' => 'posted',
                     'posted_at' => Carbon::now(),

@@ -1,4 +1,6 @@
 import './bootstrap';
+import './lightbox';  // Importer le fichier lightbox.js
+
 
 import Alpine from 'alpinejs';
 

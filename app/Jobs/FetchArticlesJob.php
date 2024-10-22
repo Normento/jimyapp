@@ -29,55 +29,34 @@ class FetchArticlesJob implements ShouldQueue
 
     public function handle()
     {
-        $league = League::inRandomOrder()->first();
+        //$league = League::inRandomOrder()->first();
+        //$apikey = env('API_KEY');
 
-        $apiUrl = "https://google-news13.p.rapidapi.com/sport?lr={$league->code}";
+        //$apiUrl = "https://google-news13.p.rapidapi.com/sport?lr={$league->code}";
+        $apiUrl = "https://newsapi.org/v2/top-headlines/?sources=lequipe";
 
         $response = Http::withHeaders([
-            'x-rapidapi-host' => 'google-news13.p.rapidapi.com',
-            'x-rapidapi-key' => env('EXTERNAL_API_KEY'),
+            'apiKey' => env('API_KEY'),
         ])->get($apiUrl);
 
         if ($response->successful()) {
             $articles = $response->json();
 
-            if (isset($articles['items'])) {
-                foreach ($articles['items'] as $article) {
+            if (isset($articles['articles'])) {
+                foreach ($articles['articles'] as $article) {
                     try {
                        // $rewrittenContent = $this->openAiService->write($article['title'], $article['snippet']);
 
                         RewrittenArticle::create([
-                            'league_id'   => $league->id,
+                            'league_id'   => 1,
                             'title'       => $article['title'],
-                            'description' => $article['snippet'],
-                            'content'     => $article['snippet'],
-                            'url'         => $article['newsUrl'],
-                            'image_url'   => $article['images']['thumbnail'] ?? null,
+                            'description' => $article['description'],
+                            'content'     => $article['content'],
+                            'url'         => $article['url'],
+                            'image_url'   => $article['urlToImage'] ?? null,
                             'status'      => 'processed',
                         ]);
 
-                        if ($article['hasSubnews'] == true) {
-                            foreach ($article['subnews'] as $subnews) {
-                                try {
-                                    //$rewrittenSubnewsContent = $this->openAiService->write($subnews['title'], $subnews['snippet']);
-
-                                    RewrittenArticle::create([
-                                        'league_id'   => $league->id,
-                                        'title'       => $subnews['title'],
-                                        'description' => $subnews['snippet'],
-                                        'content'     => $subnews['snippet'],
-                                        'url'         => $subnews['newsUrl'],
-                                        'image_url'   => $subnews['images']['thumbnail']?? null,
-                                        'status'      => 'processed',
-                                    ]);
-                                } catch (\Exception $e) {
-                                    Log::error('Erreur lors du traitement de la sous-nouvelle', [
-                                        'error' => $e->getMessage(),
-                                        'article_title' => $subnews['title'] ?? 'Titre inconnu',
-                                    ]);
-                                }
-                            }
-                        }
                     } catch (\Exception $e) {
                         Log::error('Erreur lors du traitement de l\'article', [
                             'error' => $e->getMessage(),

@@ -18,9 +18,9 @@ class RewrittenArticleResource extends Resource
     protected static ?string $model = RewrittenArticle::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    protected static ?string $navigationLabel = 'Articles Réécrits';
-    protected static ?string $pluralModelLabel = 'Articles Réécrits';
-    protected static ?string $modelLabel = 'Article Réécrit';
+    protected static ?string $navigationLabel = 'Articles';
+    protected static ?string $pluralModelLabel = 'Articles';
+    protected static ?string $modelLabel = 'Article';
 
     public static function form(Form $form): Form
     {
@@ -60,6 +60,8 @@ class RewrittenArticleResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
+                Tables\Columns\ImageColumn::make('image_url') ->label('Image')
+                ->size(100)->extraAttributes(['class' => 'lightbox']),
                 Tables\Columns\TextColumn::make('league.name')->label('Ligue')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('title')->sortable()->wrap()->toggleable()->searchable(),
                 Tables\Columns\TextColumn::make('content')->sortable()->wrap()->toggleable()->searchable(),
