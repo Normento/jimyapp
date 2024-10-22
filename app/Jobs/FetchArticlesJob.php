@@ -54,7 +54,7 @@ class FetchArticlesJob implements ShouldQueue
                             'content'     => $article['content'],
                             'url'         => $article['url'],
                             'image_url'   => $article['urlToImage'] ?? null,
-                            'status'      => 'processed',
+                            'status'      => 'pending',
                         ]);
 
                     } catch (\Exception $e) {

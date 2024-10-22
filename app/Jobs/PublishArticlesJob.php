@@ -38,8 +38,8 @@ class PublishArticlesJob implements ShouldQueue
             return;
         }
 
-        // Étape 2 : Récupérer les articles réécrits avec le statut 'processed'
-        $articles = RewrittenArticle::where('status', 'processed')
+        // Étape 2 : Récupérer les articles réécrits avec le statut 'pending'
+        $articles = RewrittenArticle::where('status', 'pending')
             ->take($publicationConfig->number_of_posts_per_day)
             ->get();
 
@@ -56,15 +56,6 @@ class PublishArticlesJob implements ShouldQueue
             return;
         }
 
-        // Étape 4 : Initialiser le service Facebook
-        $facebookService = new FacebookService(new \Facebook\Facebook([
-            'app_id' => env('FACEBOOK_APP_ID'),
-            'app_secret' => env('FACEBOOK_APP_SECRET'),
-            'default_graph_version' => 'v12.0',
-        ]));
-
-        $facebookService->setPageAccessToken($facebookPage->access_token);
-        $facebookService->setPageId($facebookPage->facebook_page_id);
 
         // Étape 5 : Programmer la publication des articles
         foreach ($articles as $index => $article) {

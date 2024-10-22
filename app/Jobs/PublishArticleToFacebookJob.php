@@ -47,9 +47,11 @@ class PublishArticleToFacebookJob implements ShouldQueue
 
         $facebookService = new FacebookService();
 
+        $pub = "Code promo 1xbet : BOURSE";
+
         // Publier l'article sur la page Facebook
         try {
-            $message = $article->title . "\n\n" . $article->content;
+            $message = $article->title . "\n\n" . $article->description . "\n\n" .$pub;
             $imageUrl = $article->image_url; // URL de l'image associée à l'article, si disponible
 
             // Appel à l'API via le service Facebook
@@ -70,6 +72,8 @@ class PublishArticleToFacebookJob implements ShouldQueue
             ];
 
             FacebookPost::create($data);
+
+            $article->update(['status' => 'processed']);
 
             //Log::info('Article ID ' . $article->id . ' publié avec succès sur Facebook. ID de la publication Facebook : ' . $response['id']);
 
