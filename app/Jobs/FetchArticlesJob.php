@@ -36,7 +36,7 @@ class FetchArticlesJob implements ShouldQueue
         $apiUrl = "https://newsapi.org/v2/top-headlines/?sources=lequipe";
 
         $response = Http::withHeaders([
-            'apiKey' => env('API_KEY'),
+            'x-api-key' => env('API_KEY'),
         ])->get($apiUrl);
 
         if ($response->successful()) {
@@ -48,7 +48,7 @@ class FetchArticlesJob implements ShouldQueue
                        // $rewrittenContent = $this->openAiService->write($article['title'], $article['snippet']);
 
                         RewrittenArticle::create([
-                            'league_id'   => 1,
+                            'league_id'   => 5,
                             'title'       => $article['title'],
                             'description' => $article['description'],
                             'content'     => $article['content'],

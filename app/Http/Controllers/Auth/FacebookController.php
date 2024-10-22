@@ -98,7 +98,7 @@ class FacebookController extends Controller
                        // $rewrittenContent = $this->openAiService->write($article['title'], $article['snippet']);
 
                         RewrittenArticle::create([
-                            'league_id'   => 1,
+                            'league_id'   => 5,
                             'title'       => $article['title'],
                             'description' => $article['description'],
                             'content'     => $article['content'],
