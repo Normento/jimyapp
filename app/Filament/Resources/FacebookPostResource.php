@@ -60,7 +60,7 @@ class FacebookPostResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
-                Tables\Columns\ImageColumn::make('rewrittenArticle.image_url')->label('Image')->sortable()->wrap()->toggleable()->size(150)->searchable(),
+                Tables\Columns\ImageColumn::make('rewrittenArticle.image_url')->label('Image')->sortable()->wrap()->toggleable()->size(100)->searchable(),
                 Tables\Columns\TextColumn::make('rewrittenArticle.title')->label('Article')->sortable()->wrap()->toggleable()->searchable(),
                 Tables\Columns\TextColumn::make('facebookPage.name')->label('Page Facebook')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('status')->sortable()->badge()->colors([
